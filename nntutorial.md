@@ -460,15 +460,15 @@ multiplyGate.prototype = {
     // store pointers to input Units u0 and u1 and output unit utop
     this.u0 = u0; 
     this.u1 = u1; 
-    this.utop = new Unit(u0.value * u1.value, 0.0);
+    this.utop = new Unit(u0.value * u1.value, 1.0);
     return this.utop;
   },
   backward: function() {
     // take the gradient in output unit and chain it with the
     // local gradients, which we derived for multiply gate before
     // then write those gradients to those Units.
-    this.u0.grad += this.u1.value * this.utop.grad;
-    this.u1.grad += this.u0.value * this.utop.grad;
+    this.u0.grad = this.u1.value * this.utop.grad;
+    this.u1.grad = this.u0.value * this.utop.grad;
   }
 }
 ```
@@ -486,8 +486,8 @@ addGate.prototype = {
   },
   backward: function() {
     // add gate. derivative wrt both inputs is 1
-    this.u0.grad += 1 * this.utop.grad;
-    this.u1.grad += 1 * this.utop.grad;
+    this.u0.grad = 1 * this.utop.grad;
+    this.u1.grad = 1 * this.utop.grad;
   }
 }
 ```
@@ -500,12 +500,12 @@ var sigmoidGate = function() {
 sigmoidGate.prototype = {
   forward: function(u0) {
     this.u0 = u0;
-    this.utop = new Unit(this.sig(this.u0.value), 0.0);
+    this.utop = new Unit(this.sig(this.u0.value), 1.0);
     return this.utop;
   },
   backward: function() {
     var s = this.sig(this.u0.value);
-    this.u0.grad += (s * (1 - s)) * this.utop.grad;
+    this.u0.grad = (s * (1 - s)) * this.utop.grad;
   }
 }
 ```
